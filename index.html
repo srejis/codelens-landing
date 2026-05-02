@@ -160,13 +160,14 @@
         <p class="section-copy">Share your work email and optional GitHub repo. We'll use that to qualify teams and follow up with teams that want graph-based code understanding.</p>
       </div>
       <div class="waitlist-shell" data-reveal>
-        <form id="analyze-form" class="analyze-form" action="[FALLBACK_FORM_ACTION]" method="get">
+        <form id="analyze-form" class="analyze-form" action="https://formspree.io/f/xrejbjbb" method="POST">
           <label class="sr-only" for="waitlist-email">Work email</label>
           <input id="waitlist-email" name="email" type="email" placeholder="your@company.com" required>
           <label class="sr-only" for="repo-url">GitHub repo</label>
           <input id="repo-url" name="repo" type="url" placeholder="GitHub repo (optional)">
           <button type="submit">Analyze My Codebase</button>
         </form>
+        <p id="form-status" class="form-status" aria-live="polite"></p>
         <p class="form-note">Best fit for engineering teams onboarding into complex production codebases.</p>
       </div>
     </section>
@@ -191,21 +192,49 @@
     });
 
     const analyzeForm = document.getElementById('analyze-form');
-    analyzeForm.addEventListener('submit', (event) => {
+    const formStatus = document.getElementById('form-status');
+
+    const setFormStatus = (message, type) => {
+      formStatus.textContent = message;
+      formStatus.className = type ? `form-status is-${type}` : 'form-status';
+    };
+
+    analyzeForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      setFormStatus('', '');
+
       const email = document.getElementById('waitlist-email').value.trim();
       const repo = document.getElementById('repo-url').value.trim();
       if (!email) return;
 
-      gtag('event', 'email_submit');
+      if (typeof gtag === 'function') {
+        gtag('event', 'email_submit');
+      }
       if (repo) {
-        gtag('event', 'repo_submit');
+        if (typeof gtag === 'function') {
+          gtag('event', 'repo_submit');
+        }
       }
 
-      const action = analyzeForm.getAttribute('action') || '';
-      if (!action || action.includes('[')) {
-        event.preventDefault();
-        const body = repo ? `Email: ${email}\nRepo: ${repo}` : `Email: ${email}`;
-        window.location.href = 'mailto:hello@codelens.dev?subject=Analyze%20My%20Codebase&body=' + encodeURIComponent(body);
+      const formData = new FormData(analyzeForm);
+
+      try {
+        const response = await fetch(analyzeForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          analyzeForm.reset();
+          setFormStatus("Thanks. We'll reach out shortly.", 'success');
+        } else {
+          setFormStatus('Submission failed. Please try again.', 'error');
+        }
+      } catch (error) {
+        setFormStatus('Submission failed. Please try again.', 'error');
       }
     });
 
