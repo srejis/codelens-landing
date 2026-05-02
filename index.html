@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeLens</title>
+<meta name="description" content="Understand your code without reading it. See structure and flow instantly.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=[GA4_MEASUREMENT_ID]"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '[GA4_MEASUREMENT_ID]');
+</script>
+</head>
+<body>
+  <div class="bg-canvas" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <nav class="site-nav">
+    <a class="brand" href="#top" aria-label="CodeLens home">
+      <span class="brand-dot"></span>
+      <span class="brand-text">CODELENS</span>
+    </a>
+    <a class="nav-cta" href="#demo" data-track="cta_click">Try Demo</a>
+  </nav>
+
+  <main id="top">
+    <section class="hero section">
+      <div class="hero-inner">
+        <p class="hero-audience fade fade-0">AI CODEBASE INTELLIGENCE</p>
+        <h1 class="hero-title fade fade-0">Understand your code without reading it.</h1>
+        <p class="hero-copy fade fade-1">See structure and flow instantly.</p>
+        <a class="primary-cta fade fade-2" href="#demo" data-track="cta_click">Try Demo <span class="arrow-icon">&rarr;</span></a>
+        <p class="hero-hint fade fade-2"><span class="arrow-icon">&darr;</span> Click once. Understand faster.</p>
+      </div>
+    </section>
+
+    <section class="section problem">
+      <div class="section-head centered" data-reveal>
+        <p class="section-kicker">THE PROBLEM</p>
+        <h2>Sound familiar?</h2>
+      </div>
+      <div class="problem-grid">
+        <article class="problem-card problem-card-indigo" data-reveal data-reveal-delay="1">
+          <div class="problem-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 6v4.5l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Weeks just reading</h3>
+          <p>New devs spend <span class="hl">2&ndash;6 weeks</span> just understanding the codebase before writing a single line.</p>
+        </article>
+
+        <article class="problem-card problem-card-cyan" data-reveal data-reveal-delay="2">
+          <div class="problem-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M8 8a2.5 2.5 0 014.33 1.5c0 1.5-2.33 2-2.33 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="10" cy="15" r="0.75" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3>Nobody knows why</h3>
+          <p>Half the modules exist for reasons lost to time. No docs, no comments, no history.</p>
+        </article>
+
+        <article class="problem-card problem-card-green" data-reveal data-reveal-delay="3">
+          <div class="problem-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M4 17c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M15 2v4M13 4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>Senior devs interrupted</h3>
+          <p>Your best engineers spend <span class="hl">30%</span> of their time answering &quot;what does this do?&quot; questions.</p>
+        </article>
+      </div>
+      <p class="problem-summary" data-reveal>This is not a documentation problem. It's a code understanding problem.</p>
+    </section>
+
+    <section class="section result">
+      <div class="section-head centered" data-reveal>
+        <p class="section-kicker">WHY IT'S POSSIBLE</p>
+        <h2>Built on static + semantic analysis.</h2>
+      </div>
+      <div class="result-grid">
+        <article class="result-card" data-reveal data-reveal-delay="1">
+          <h3>Reconstructs flow without execution</h3>
+          <p>CodeLens rebuilds execution connections and dependencies without having to run the codebase first.</p>
+        </article>
+        <article class="result-card" data-reveal data-reveal-delay="2">
+          <h3>Interprets node roles semantically</h3>
+          <p>Each node is explained in terms humans care about: what it is for, what it does, and why it exists.</p>
+        </article>
+        <article class="result-card" data-reveal data-reveal-delay="3">
+          <h3>Organizes code into a navigable graph</h3>
+          <p>Structure, flow, and responsibilities become a visual system you can explore instead of a folder tree you endure.</p>
+        </article>
+      </div>
+      <p class="result-summary" data-reveal>Understand in minutes, not weeks.</p>
+    </section>
+
+    <section class="section demo" id="demo">
+      <div class="section-head" data-reveal>
+        <p class="section-kicker">LIVE DEMO</p>
+        <h2>See it in action.</h2>
+        <p class="section-copy">Traditional: read files, trace manually. CodeLens: see structure instantly.</p>
+      </div>
+      <div class="demo-frame" id="demo-frame">
+        <div class="demo-badge">LIVE INTERACTIVE</div>
+        <div class="demo-loading" id="demo-loading">Loading demo...</div>
+        <iframe id="demo-iframe" src="visualizer.html" title="CodeLens live demo" loading="lazy"></iframe>
+      </div>
+      <p class="demo-caption"><span class="arrow-icon">&uarr;</span> Fully interactive &mdash; this is not a screenshot</p>
+    </section>
+
+    <section class="section how">
+      <div class="section-head centered" data-reveal>
+        <p class="section-kicker">HOW IT WORKS</p>
+        <h2>From repo to understanding.</h2>
+      </div>
+      <div class="steps">
+        <article class="step" data-reveal data-reveal-delay="1">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h3>Upload repo</h3>
+            <p>Start with your source directory or GitHub repository.</p>
+          </div>
+        </article>
+        <article class="step" data-reveal data-reveal-delay="2">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h3>AI maps structure and purpose</h3>
+            <p>CodeLens connects modules, functions, dependencies, and intent into one explorable map.</p>
+          </div>
+        </article>
+        <article class="step" data-reveal data-reveal-delay="3">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h3>Explore the graph</h3>
+            <p>Search, click, and drill down until the codebase makes sense.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section waitlist" id="waitlist">
+      <div class="section-head centered" data-reveal>
+        <p class="section-kicker">TRY IT</p>
+        <h2>Try it on your codebase</h2>
+        <p class="section-copy">Share your work email and optional GitHub repo. We'll use that to qualify teams and follow up with teams that want graph-based code understanding.</p>
+      </div>
+      <div class="waitlist-shell" data-reveal>
+        <form id="analyze-form" class="analyze-form" action="[FALLBACK_FORM_ACTION]" method="get">
+          <label class="sr-only" for="waitlist-email">Work email</label>
+          <input id="waitlist-email" name="email" type="email" placeholder="your@company.com" required>
+          <label class="sr-only" for="repo-url">GitHub repo</label>
+          <input id="repo-url" name="repo" type="url" placeholder="GitHub repo (optional)">
+          <button type="submit">Analyze My Codebase</button>
+        </form>
+        <p class="form-note">Best fit for engineering teams onboarding into complex production codebases.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="brand" href="#top" aria-label="CodeLens home">
+      <span class="brand-dot"></span>
+      <span class="brand-text footer-brand-text">CODELENS</span>
+    </a>
+    <p class="footer-tagline">AI codebase intelligence for engineering teams.</p>
+    <p class="footer-copy">&copy; 2025 CodeLens. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.documentElement.style.scrollBehavior = 'smooth';
+
+    document.querySelectorAll('[data-track="cta_click"]').forEach((el) => {
+      el.addEventListener('click', () => {
+        gtag('event', 'cta_click');
+      });
+    });
+
+    const analyzeForm = document.getElementById('analyze-form');
+    analyzeForm.addEventListener('submit', (event) => {
+      const email = document.getElementById('waitlist-email').value.trim();
+      const repo = document.getElementById('repo-url').value.trim();
+      if (!email) return;
+
+      gtag('event', 'email_submit');
+
+      const action = analyzeForm.getAttribute('action') || '';
+      if (!action || action.includes('[')) {
+        event.preventDefault();
+        const body = repo ? `Email: ${email}\nRepo: ${repo}` : `Email: ${email}`;
+        window.location.href = 'mailto:hello@codelens.dev?subject=Analyze%20My%20Codebase&body=' + encodeURIComponent(body);
+      }
+    });
+
+    const demoFrame = document.getElementById('demo-frame');
+    const demoIframe = document.getElementById('demo-iframe');
+    demoIframe.addEventListener('load', () => {
+      demoFrame.classList.add('is-loaded');
+    });
+
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    document.querySelectorAll('[data-reveal]').forEach((el) => {
+      revealObserver.observe(el);
+    });
+  </script>
+</body>
+</html>
