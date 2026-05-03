@@ -29,7 +29,7 @@
       <span class="brand-dot"></span>
       <span class="brand-text">CODELENS</span>
     </a>
-    <a class="nav-cta" href="#hero-form" data-track="cta_click">Get Early Access</a>
+    <a class="nav-cta" href="#hero-trigger" data-track="cta_click">Get Early Access</a>
   </nav>
 
   <main id="top">
@@ -40,10 +40,13 @@
           Getting up to speed shouldn't take
           <span class="hl-week">two weeks</span> of <span class="hl-confusion">confusion.</span>
         </p>
-        <form id="hero-form" class="hero-form fade fade-2">
-          <input id="hero-email" name="email" type="email" placeholder="your@email.com" required autocomplete="email">
-          <button type="submit">I want this</button>
-        </form>
+        <div class="hero-cta-wrap fade fade-2">
+          <button id="hero-trigger" class="hero-trigger-btn">I want this</button>
+          <form id="hero-form" class="hero-form" hidden>
+            <input id="hero-email" name="email" type="email" placeholder="your@email.com" required autocomplete="email">
+            <button type="submit">Apply for Early Access</button>
+          </form>
+        </div>
         <div id="segment-block" class="segment-block" aria-live="polite" hidden>
           <p class="segment-question">Which best describes your situation?</p>
           <div class="segment-choices">
@@ -137,6 +140,7 @@
     });
 
     // Hero form — 이메일 수집 + 세그먼트 노출
+    const heroTrigger = document.getElementById('hero-trigger');
     const heroForm = document.getElementById('hero-form');
     const segmentBlock = document.getElementById('segment-block');
     const segmentThanks = document.getElementById('segment-thanks');
@@ -144,6 +148,17 @@
 
     let heroEmail = '';
 
+    // 1단계: 트리거 버튼 클릭 → 폼 노출
+    if (heroTrigger) {
+      heroTrigger.addEventListener('click', () => {
+        heroTrigger.hidden = true;
+        heroForm.hidden = false;
+        document.getElementById('hero-email').focus();
+        if (typeof gtag === 'function') gtag('event', 'hero_trigger_click');
+      });
+    }
+
+    // 2단계: 이메일 제출 → 세그먼트 노출
     if (heroForm) {
       heroForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -152,7 +167,6 @@
 
         if (typeof gtag === 'function') gtag('event', 'hero_email_submit');
 
-        // Formspree로 이메일 저장 (기존 waitlist 엔드포인트 재사용)
         const fd = new FormData();
         fd.append('email', heroEmail);
         fd.append('source', 'hero');
@@ -160,8 +174,7 @@
           method: 'POST', body: fd, headers: { Accept: 'application/json' }
         });
 
-        // 폼 숨기고 세그먼트 노출
-        heroForm.style.display = 'none';
+        heroForm.hidden = true;
         segmentBlock.hidden = false;
       });
     }
@@ -230,11 +243,15 @@
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('is-visible');
-            revealObserver.unobserve(entry.target);
+          } else {
+            entry.target.classList.remove('is-visible');
           }
         });
       },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      {
+        threshold: 0.2,
+        rootMargin: '-25% 0px -25% 0px'
+      }
     );
 
     document.querySelectorAll('[data-reveal]').forEach((el) => {

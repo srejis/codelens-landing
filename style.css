@@ -267,6 +267,11 @@ a { color: inherit; text-decoration: none; }
 [data-reveal-delay="2"] { transition-delay: 160ms; }
 [data-reveal-delay="3"] { transition-delay: 240ms; }
 
+/* 사라질 때는 딜레이 없음 */
+[data-reveal-delay="1"]:not(.is-visible) { transition-delay: 0ms; }
+[data-reveal-delay="2"]:not(.is-visible) { transition-delay: 0ms; }
+[data-reveal-delay="3"]:not(.is-visible) { transition-delay: 0ms; }
+
 .section-head { margin-bottom: 28px; }
 
 .section-head.centered {
@@ -536,27 +541,27 @@ a { color: inherit; text-decoration: none; }
 
 /* ─── 감정 축 강조 키워드 ─────────────────────────── */
 .hl-week {
-  color: #f59e0b;
-  -webkit-text-fill-color: #f59e0b;
+  color: #22d3ee;
+  -webkit-text-fill-color: #22d3ee;
   background: none;
   font-weight: 600;
-  text-shadow: 0 0 20px rgba(245,158,11,0.4);
+  text-shadow: 0 0 20px rgba(34,211,238,0.45);
 }
 
 .hl-confusion {
-  color: #f87171;
-  -webkit-text-fill-color: #f87171;
+  color: #22d3ee;
+  -webkit-text-fill-color: #22d3ee;
   background: none;
   font-weight: 600;
-  text-shadow: 0 0 20px rgba(248,113,113,0.4);
+  text-shadow: 0 0 20px rgba(34,211,238,0.45);
 }
 
 .hl-understand {
-  color: #a78bfa;
-  -webkit-text-fill-color: #a78bfa;
+  color: #22d3ee;
+  -webkit-text-fill-color: #22d3ee;
   background: none;
   font-weight: 600;
-  text-shadow: 0 0 20px rgba(167,139,250,0.35);
+  text-shadow: 0 0 20px rgba(34,211,238,0.45);
 }
 
 .hl-stress {
@@ -566,11 +571,40 @@ a { color: inherit; text-decoration: none; }
   text-shadow: 0 0 28px rgba(248,113,113,0.5);
 }
 
+/* ─── Hero Trigger Button ────────────────────────── */
+.hero-cta-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-top: 32px;
+}
+
+.hero-trigger-btn {
+  min-height: 52px;
+  padding: 0 48px;
+  border: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 0 28px rgba(99,102,241,0.4), 0 4px 16px rgba(0,0,0,0.24);
+}
+
+.hero-trigger-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 40px rgba(99,102,241,0.55), 0 8px 24px rgba(0,0,0,0.28);
+}
+
 /* ─── Hero Form ──────────────────────────────────── */
 .hero-form {
   display: inline-flex;
   gap: 10px;
-  margin-top: 32px;
+  margin-top: 12px;
   flex-wrap: wrap;
   justify-content: center;
 }
