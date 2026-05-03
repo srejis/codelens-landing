@@ -151,6 +151,7 @@
     const segOtherInput = document.getElementById('seg-other-input');
 
     let heroEmail = '';
+    let leadId = null; // INSERT 후 반환된 row ID (세그먼트 PATCH용)
 
     // 1단계: 트리거 버튼 클릭 → 폼 노출
     if (heroTrigger) {
@@ -171,15 +172,12 @@
 
         if (typeof gtag === 'function') gtag('event', 'hero_email_submit');
 
-        await saveLead({
-          email: heroEmail,
-          choice: null,
-          willingness: null,
-          other_text: null
-        });
-
+        // UI 먼저 업데이트 — DB 결과와 무관하게 즉시 반응
         heroForm.hidden = true;
         segmentBlock.hidden = false;
+
+        // DB 저장 (백그라운드, 실패해도 UI에 영향 없음)
+        leadId = await insertLead(heroEmail);
       });
     }
 
@@ -212,30 +210,63 @@
       });
     });
 
-    async function saveSegment(seg, text) {
-      await saveLead({
-        email: heroEmail,
-        choice: seg,
-        willingness: null,
-        other_text: text || null
-      });
+    // 이메일 INSERT → row ID 반환
+    async function insertLead(email) {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
+          method: 'POST',
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=representation'
+          },
+          body: JSON.stringify({ email, choice: null, willingness: null, other_text: null })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          return data[0]?.id ?? null;
+        }
+        console.error('Supabase insert failed:', await res.text());
+        return null;
+      } catch (err) {
+        console.error('Supabase network error:', err);
+        return null;
+      }
     }
 
-    async function saveLead(payload) {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
-        method: 'POST',
-        headers: {
-          apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`,
-          'Content-Type': 'application/json',
-          Prefer: 'return=minimal'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error('Supabase insert failed:', errorText);
+    // 세그먼트 — 기존 row PATCH (없으면 INSERT fallback)
+    async function saveSegment(seg, text) {
+      try {
+        if (leadId) {
+          // 동일 row 업데이트 (이중 insert 방지)
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/leads?id=eq.${leadId}`, {
+            method: 'PATCH',
+            headers: {
+              apikey: SUPABASE_KEY,
+              Authorization: `Bearer ${SUPABASE_KEY}`,
+              'Content-Type': 'application/json',
+              Prefer: 'return=minimal'
+            },
+            body: JSON.stringify({ choice: seg, other_text: text || null })
+          });
+          if (!res.ok) console.error('Supabase patch failed:', await res.text());
+        } else {
+          // leadId 없을 때 fallback INSERT
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
+            method: 'POST',
+            headers: {
+              apikey: SUPABASE_KEY,
+              Authorization: `Bearer ${SUPABASE_KEY}`,
+              'Content-Type': 'application/json',
+              Prefer: 'return=minimal'
+            },
+            body: JSON.stringify({ email: heroEmail, choice: seg, willingness: null, other_text: text || null })
+          });
+          if (!res.ok) console.error('Supabase insert failed:', await res.text());
+        }
+      } catch (err) {
+        console.error('Supabase network error:', err);
       }
     }
 
