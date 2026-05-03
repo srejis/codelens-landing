@@ -593,6 +593,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .hero-trigger-btn {
+  scroll-margin-top: 35vh;
   min-height: 52px;
   padding: 0 48px;
   border: 0;
