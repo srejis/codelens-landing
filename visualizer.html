@@ -610,32 +610,7 @@
 
 <div id="tooltip"></div>
 
-<footer id="site-footer">
-  <a href="mailto:srejis12@gmail.com">srejis12@gmail.com</a>
-</footer>
 
-<style>
-  #site-footer {
-    position: fixed;
-    bottom: 10px;
-    right: 16px;
-    z-index: 50;
-    font-size: 10px;
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 0.06em;
-    color: var(--text-dim);
-    pointer-events: auto;
-  }
-  #site-footer a {
-    color: var(--text-dim);
-    text-decoration: none;
-    transition: color 0.15s;
-  }
-  #site-footer a:hover { color: var(--accent); }
-  @media (max-width: 639px) {
-    #site-footer { font-size: 9px; bottom: 8px; right: 10px; }
-  }
-</style>
 
 <script>
 // ??? GRAPH DATA (loaded from graph-data.json) ?????????????????????????????????
@@ -927,167 +902,28 @@ canvas.addEventListener('wheel', e=>{
   offsetX=cx-wx*scale; offsetY=cy-wy*scale; draw();
 },{passive:false});
 // ═══════════════════════════════════════════════════════════════
-// TOUCH EVENTS  (모바일 팬 + 핀치줌)
+// SIDEBAR TOGGLE
 // ═══════════════════════════════════════════════════════════════
-let _touchStartPos = null;
-let _touchPinchDist = null;
-
-canvas.addEventListener('touchstart', e => {
-  e.preventDefault();
-  if (e.touches.length === 1) {
-    const t = e.touches[0];
-    const rect = canvas.getBoundingClientRect();
-    const cx = t.clientX - rect.left, cy = t.clientY - rect.top;
-    dragging = true;
-    dragStart = { x: cx, y: cy };
-    panStart  = { x: offsetX, y: offsetY };
-    _touchStartPos  = { x: cx, y: cy };
-    _touchPinchDist = null;
-  } else if (e.touches.length === 2) {
-    dragging = false;
-    const t0 = e.touches[0], t1 = e.touches[1];
-    _touchPinchDist = Math.hypot(t1.clientX-t0.clientX, t1.clientY-t0.clientY);
-    _touchStartPos  = null;
-  }
-}, { passive: false });
-
-canvas.addEventListener('touchmove', e => {
-  e.preventDefault();
-  const rect = canvas.getBoundingClientRect();
-  if (e.touches.length === 1 && dragging) {
-    const t = e.touches[0];
-    offsetX = panStart.x + (t.clientX - rect.left) - dragStart.x;
-    offsetY = panStart.y + (t.clientY - rect.top)  - dragStart.y;
-    draw();
-  } else if (e.touches.length === 2 && _touchPinchDist !== null) {
-    const t0 = e.touches[0], t1 = e.touches[1];
-    const newDist = Math.hypot(t1.clientX-t0.clientX, t1.clientY-t0.clientY);
-    const ratio = newDist / _touchPinchDist;
-    const mx = ((t0.clientX+t1.clientX)/2) - rect.left;
-    const my = ((t0.clientY+t1.clientY)/2) - rect.top;
-    const wx = (mx - offsetX)/scale, wy = (my - offsetY)/scale;
-    scale = Math.max(0.15, Math.min(6, scale * ratio));
-    offsetX = mx - wx*scale;
-    offsetY = my - wy*scale;
-    _touchPinchDist = newDist;
-    draw();
-  }
-}, { passive: false });
-
-canvas.addEventListener('touchend', e => {
-  e.preventDefault();
-  if (e.changedTouches.length === 1 && _touchStartPos) {
-    const rect = canvas.getBoundingClientRect();
-    const t = e.changedTouches[0];
-    const cx = t.clientX - rect.left, cy = t.clientY - rect.top;
-    const moved = Math.abs(cx - _touchStartPos.x) + Math.abs(cy - _touchStartPos.y) > 10;
-    dragging = false;
-    if (!moved) {
-      const w = toWorld(cx, cy);
-      const hit = hitNode(w.x, w.y);
-      if (hit) selectNode(hit); else clearSelection();
-    }
-  }
-  _touchStartPos = null; _touchPinchDist = null; dragging = false;
-}, { passive: false });
+function toggleSidebar() {
+  const sb  = document.getElementById('sidebar');
+  const btn = document.getElementById('sidebar-toggle');
+  const ov  = document.getElementById('sidebar-overlay');
+  const isOpen = sb.classList.contains('open');
+  sb.classList.toggle('open', !isOpen);
+  btn.classList.toggle('is-open', !isOpen);
+  ov.classList.toggle('show', !isOpen);
+}
 // ═══════════════════════════════════════════════════════════════
 
-
-
-// ??? ACTIONS ??????????????????????????????????????????????????????????????????
-function highlightCode(code) {
-  if (!code) return '<span style="color:#5c6370;font-style:italic">// No code snippet available</span>';
-  return code
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/(#[^\n]*)/g,'<span class="cm">$1</span>')
-    .replace(/\b(def|class|return|import|from|if|else|elif|for|while|with|as|in|not|and|or|try|except|finally|raise|yield|lambda|pass|break|continue|None|True|False|self|cls)\b/g,'<span class="kw">$1</span>')
-    .replace(/\b([A-Z][a-zA-Z0-9_]*)\b/g,'<span class="dec">$1</span>')
-    .replace(/("[^"]*"|'[^']*')/g,'<span class="str">$1</span>')
-    .replace(/\b(\d+\.?\d*)\b/g,'<span class="num">$1</span>');
-}
-
-function clearCodePanel(){
-  document.getElementById('panel-code').innerHTML = '<span style="color:#5c6370;font-style:italic">Click any node to start.</span>';
-}
-
-function selectNode(nd){
-  selectedNode=nd;
-  document.getElementById('panel').classList.add('open');
-
-  const badge=document.getElementById('p-badge');
-  badge.textContent=`TYPE: ${(nd.type || 'node').toUpperCase()}`; badge.style.background=nd.color+'25';
-  badge.style.color=nd.color; badge.style.border=`1px solid ${nd.color}55`;
-  panel.style.setProperty('--panel-accent-soft', nd.color + '12');
-  panel.style.setProperty('--panel-accent-shadow', nd.color + '60');
-  panel.style.setProperty('--panel-accent-glow', nd.color + '30');
-
-  document.getElementById('panel-title').textContent=nd.label;
-
-  // ??븷 / 泥섎━ (???щ㎎) ?먮뒗 湲곗〈 description ?대갚
-  document.getElementById('panel-role').textContent = nd.role || nd.description || 'No description available';
-  document.getElementById('panel-process').textContent = nd.process || '';
-
-  // 肄붾뱶
-  const codeEl = document.getElementById('panel-code');
-  const codeStr = nd.code || '';
-  codeEl.innerHTML = highlightCode(codeStr);
-
-  const db=document.getElementById('drill-btn');
-  db.disabled=!nd.childKey;
-  if(nd.childKey) db.onclick=()=>drillInto(nd);
-  draw();
-}
-
-function clearSelection(){
-  selectedNode=null;
-  document.getElementById('panel').classList.remove('open');
-  panel.style.removeProperty('--panel-accent-soft');
-  panel.style.removeProperty('--panel-accent-shadow');
-  panel.style.removeProperty('--panel-accent-glow');
-  clearCodePanel();
-  draw();
-}
-
-function drillInto(nd){
-  if(!nd.childKey||!GRAPH_DB[nd.childKey]) return;
-  graphStack.push({key:nd.childKey,label:nd.label,graph:GRAPH_DB[nd.childKey]});
-  selectedNode=null;
-  document.getElementById('panel').classList.remove('open');
-  clearCodePanel();
-  updateBreadcrumb(); layout(); draw();
-  canvas.classList.add('flash');
-  setTimeout(()=>canvas.classList.remove('flash'),300);
-}
-
-function goToDepth(depth){
-  graphStack=graphStack.slice(0,depth+1);
-  selectedNode=null;
-  document.getElementById('panel').classList.remove('open');
-  clearCodePanel();
-  updateBreadcrumb(); layout(); draw();
-}
-
-function updateBreadcrumb(){
-  document.getElementById('breadcrumb').innerHTML=graphStack.map((s,i)=>{
-    if(i<graphStack.length-1) return `<button class="crumb-btn" onclick="goToDepth(${i})">${s.label}</button><span class="crumb-sep"> / </span>`;
-    return `<span class="crumb-current">${s.label}</span>`;
-  }).join('');
-}
-
-function resetView(){ offsetX=0;offsetY=0;scale=1;draw(); }
-function fitGraph(){
-  if(!nodes.length) return;
-  const xs=nodes.map(n=>n.x), ys=nodes.map(n=>n.y);
-  const minX=Math.min(...xs)-60, maxX=Math.max(...xs)+60;
-  const minY=Math.min(...ys)-60, maxY=Math.max(...ys)+60;
-  const W=canvas.width, H=canvas.height;
-  scale=Math.min(W/(maxX-minX),H/(maxY-minY),2);
-  offsetX=W/2-((minX+maxX)/2)*scale;
-  offsetY=H/2-((minY+maxY)/2)*scale;
-  draw();
-}
-function goToRoot(){ graphStack=[{key:'root',label:'Root',graph:GRAPH_DB.root}]; selectedNode=null; document.getElementById('panel').classList.remove('open'); clearCodePanel(); updateBreadcrumb(); layout(); draw(); }
-
-document.getElementById('panel-close').onclick=()=>clearSelection();
-
-// ═════════════════════════════════════
+// INIT: graph-data.json 로드 후 시작
+fetch('graph-data.json')
+  .then(r => r.json())
+  .then(data => {
+    GRAPH_DB = data;
+    graphStack = [{ key: 'root', label: 'Root', graph: GRAPH_DB.root }];
+    layout();
+    draw();
+  })
+  .catch(err => {
+    console.error('graph-data.json load failed:', err);
+    document.body.innerHTML += '<div style="color:#ef4444;pad

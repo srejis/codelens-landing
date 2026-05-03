@@ -523,6 +523,19 @@ a { color: inherit; text-decoration: none; }
   font-size: 11px;
 }
 
+.footer-contact {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+}
+.footer-contact a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.footer-contact a:hover { color: var(--accent); }
+
 .footer-license {
   margin-top: 6px;
   font-size: 11px;
