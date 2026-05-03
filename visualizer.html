@@ -925,7 +925,7 @@ function highlightCode(code) {
     // numbers
     .replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
 
-getElementById('panel-code').innerHTML = highlighted;
+  document.getElementById('panel-code').innerHTML = highlighted;
 }
 
 function clearCodePanel() {
