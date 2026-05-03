@@ -102,28 +102,6 @@
       <p class="problem-summary" data-reveal>This is not a documentation problem. It's a <span class="hl">code understanding</span> problem.</p>
     </section>
 
-    <section class="section result">
-      <div class="section-head centered" data-reveal>
-        <p class="section-kicker">WHY IT'S POSSIBLE</p>
-        <h2>Built on static + semantic analysis.</h2>
-      </div>
-      <div class="result-grid">
-        <article class="result-card" data-reveal data-reveal-delay="1">
-          <h3>Reconstructs flow without execution</h3>
-          <p>CodeLens rebuilds execution connections and dependencies without having to run the codebase first.</p>
-        </article>
-        <article class="result-card" data-reveal data-reveal-delay="2">
-          <h3>Interprets node roles semantically</h3>
-          <p>Each node is explained in terms humans care about: what it is for, what it does, and why it exists.</p>
-        </article>
-        <article class="result-card" data-reveal data-reveal-delay="3">
-          <h3>Organizes code into a navigable graph</h3>
-          <p>Structure, flow, and responsibilities become a visual system you can explore instead of a folder tree you endure.</p>
-        </article>
-      </div>
-      <p class="result-summary" data-reveal>Understand in <span class="hl">minutes</span>, not weeks.</p>
-    </section>
-
     <section class="section demo" id="demo">
       <div class="section-head" data-reveal>
         <p class="section-kicker">LIVE DEMO</p>
@@ -138,54 +116,6 @@
       <p class="demo-caption"><span class="arrow-icon">&uarr;</span> Fully interactive &mdash; this is not a screenshot</p>
     </section>
 
-    <section class="section how">
-      <div class="section-head centered" data-reveal>
-        <p class="section-kicker">HOW IT WORKS</p>
-        <h2>From repo to understanding.</h2>
-      </div>
-      <div class="steps">
-        <article class="step" data-reveal data-reveal-delay="1">
-          <div class="step-num">01</div>
-          <div class="step-body">
-            <h3>Upload repo</h3>
-            <p>Start with your source directory or GitHub repository.</p>
-          </div>
-        </article>
-        <article class="step" data-reveal data-reveal-delay="2">
-          <div class="step-num">02</div>
-          <div class="step-body">
-            <h3>AI maps structure and purpose</h3>
-            <p>CodeLens connects modules, functions, dependencies, and intent into one explorable map.</p>
-          </div>
-        </article>
-        <article class="step" data-reveal data-reveal-delay="3">
-          <div class="step-num">03</div>
-          <div class="step-body">
-            <h3>Explore the graph</h3>
-            <p>Search, click, and drill down until the codebase makes sense.</p>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section class="section waitlist" id="waitlist">
-      <div class="section-head centered" data-reveal>
-        <p class="section-kicker">TRY IT</p>
-        <h2>Try it on your codebase</h2>
-        <p class="section-copy">Share your work email and optional GitHub repo. We'll use that to qualify teams and follow up with teams that want graph-based code understanding.</p>
-      </div>
-      <div class="waitlist-shell" data-reveal>
-        <form id="analyze-form" class="analyze-form" action="https://formspree.io/f/xrejbjbb" method="POST">
-          <label class="sr-only" for="waitlist-email">Work email</label>
-          <input id="waitlist-email" name="email" type="email" placeholder="your@company.com" required>
-          <label class="sr-only" for="repo-url">GitHub repo</label>
-          <input id="repo-url" name="repo" type="url" placeholder="GitHub repo (optional)">
-          <button type="submit">Analyze My Codebase</button>
-        </form>
-        <p id="form-status" class="form-status" aria-live="polite"></p>
-        <p class="form-note">Best fit for engineering teams onboarding into complex production codebases.</p>
-      </div>
-    </section>
   </main>
 
   <footer class="site-footer">
@@ -204,53 +134,6 @@
       el.addEventListener('click', () => {
         gtag('event', 'cta_click');
       });
-    });
-
-    const analyzeForm = document.getElementById('analyze-form');
-    const formStatus = document.getElementById('form-status');
-
-    const setFormStatus = (message, type) => {
-      formStatus.textContent = message;
-      formStatus.className = type ? `form-status is-${type}` : 'form-status';
-    };
-
-    analyzeForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      setFormStatus('', '');
-
-      const email = document.getElementById('waitlist-email').value.trim();
-      const repo = document.getElementById('repo-url').value.trim();
-      if (!email) return;
-
-      if (typeof gtag === 'function') {
-        gtag('event', 'email_submit');
-      }
-      if (repo) {
-        if (typeof gtag === 'function') {
-          gtag('event', 'repo_submit');
-        }
-      }
-
-      const formData = new FormData(analyzeForm);
-
-      try {
-        const response = await fetch(analyzeForm.action, {
-          method: 'POST',
-          body: formData,
-          headers: {
-            'Accept': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          analyzeForm.reset();
-          setFormStatus("Thanks. We'll reach out shortly.", 'success');
-        } else {
-          setFormStatus('Submission failed. Please try again.', 'error');
-        }
-      } catch (error) {
-        setFormStatus('Submission failed. Please try again.', 'error');
-      }
     });
 
     // Hero form — 이메일 수집 + 세그먼트 노출
