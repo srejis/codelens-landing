@@ -67,6 +67,30 @@
     display: flex; align-items: center; gap: 10px;
     -webkit-app-region: no-drag;
   }
+  #cta-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 5px 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.04em;
+    border-radius: 6px;
+    text-decoration: none;
+    box-shadow: 0 0 16px rgba(99,102,241,0.35), 0 2px 8px rgba(0,0,0,0.2);
+    transition: opacity 0.15s, box-shadow 0.15s, transform 0.15s;
+    -webkit-app-region: no-drag;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  #cta-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 0 24px rgba(99,102,241,0.55), 0 4px 12px rgba(0,0,0,0.25);
+  }
+  @media (max-width: 639px) {
+    #cta-btn { font-size: 10px; padding: 4px 10px; }
+  }
   #app-title {
     font-family: 'Syne', sans-serif;
     font-size: 13px; font-weight: 800;
@@ -541,6 +565,7 @@
     <div class="title-dot"></div>
     <div id="app-title">CodeLens &mdash; Live Demo</div>
   </div>
+  <a id="cta-btn" href="index.html#hero-trigger">Get Early Access</a>
 </div>
 
 <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
@@ -609,6 +634,33 @@
 </div>
 
 <div id="tooltip"></div>
+
+<footer id="site-footer">
+  <a href="mailto:srejis12@gmail.com">srejis12@gmail.com</a>
+</footer>
+
+<style>
+  #site-footer {
+    position: fixed;
+    bottom: 10px;
+    right: 16px;
+    z-index: 50;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    pointer-events: auto;
+  }
+  #site-footer a {
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  #site-footer a:hover { color: var(--accent); }
+  @media (max-width: 639px) {
+    #site-footer { font-size: 9px; bottom: 8px; right: 10px; }
+  }
+</style>
 
 <script>
 // ??? GRAPH DATA (loaded from graph-data.json) ?????????????????????????????????
