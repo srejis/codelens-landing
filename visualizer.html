@@ -853,6 +853,9 @@ canvas.addEventListener('mousedown',e=>{
   dragging=true; dragStart={x:e.clientX-r.left,y:e.clientY-r.top}; panStart={x:offsetX,y:offsetY};
 });
 
+// 단일 클릭 / 더블클릭 구분 타이머
+let _clickTimer = null;
+
 canvas.addEventListener('mouseup',e=>{
   const r=canvas.getBoundingClientRect();
   const cx=e.clientX-r.left, cy=e.clientY-r.top;
@@ -862,13 +865,19 @@ canvas.addEventListener('mouseup',e=>{
 
   const w=toWorld(cx,cy);
   const hit=hitNode(w.x,w.y);
-  // ?깃??대┃ ??긽 利됱떆 ?ㅽ뻾
-  if(hit) selectNode(hit);
-  else clearSelection();
+
+  // 220ms 대기: dblclick 이 오면 clearTimeout 으로 취소
+  clearTimeout(_clickTimer);
+  _clickTimer = setTimeout(() => {
+    if(hit) selectNode(hit);
+    else clearSelection();
+  }, 220);
 });
 
 canvas.addEventListener('dblclick', e=>{
   e.preventDefault();
+  clearTimeout(_clickTimer); // 단일 클릭 동작 취소 → 패널 미오픈 상태에서 진입
+  _clickTimer = null;
   const r=canvas.getBoundingClientRect();
   const w=toWorld(e.clientX-r.left, e.clientY-r.top);
   const hit=hitNode(w.x,w.y);
