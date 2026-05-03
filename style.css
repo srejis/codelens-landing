@@ -187,19 +187,19 @@ a { color: inherit; text-decoration: none; }
   display: grid;
   place-items: center;
   min-height: 620px;
-  padding-top: 96px;
-  padding-bottom: 120px;
+  padding-top: 144px;
+  padding-bottom: 180px;
   text-align: center;
 }
 
 .pain {
-  padding-top: 120px;
-  padding-bottom: 120px;
+  padding-top: 180px;
+  padding-bottom: 180px;
 }
 
 .demo {
-  padding-top: 120px;
-  padding-bottom: 120px;
+  padding-top: 180px;
+  padding-bottom: 180px;
 }
 
 .hero-inner { max-width: 920px; }
