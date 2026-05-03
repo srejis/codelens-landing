@@ -20,7 +20,7 @@
 <script>
   const SUPABASE_URL = 'https://cpjrsjxeuylyallogrpt.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_tdud7yWZqS1qYL8_UOJPKQ_BV7nVq5u';
-  const supabase = window.supabase.createClient(
+  const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
   );
@@ -230,7 +230,7 @@
 
     // 이메일 INSERT → row ID 반환
     async function insertLead(email) {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('leads')
         .insert([
           {
@@ -253,7 +253,7 @@
     // 세그먼트 — 기존 row PATCH (없으면 INSERT fallback)
     async function saveSegment(seg, text) {
       if (leadId) {
-        const { error } = await supabase
+        const { error } = await supabaseClient
           .from('leads')
           .update({
             choice: seg,
@@ -263,7 +263,7 @@
 
         if (error) console.error('Update failed:', error);
       } else {
-        const { error } = await supabase
+        const { error } = await supabaseClient
           .from('leads')
           .insert([
             {
