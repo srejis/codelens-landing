@@ -16,6 +16,7 @@
   gtag('js', new Date());
   gtag('config', 'G-9VB2K1ZCW8');
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = 'https://cpjrsjxeuylyallogrpt.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_tdud7yWZqS1qYL8_UOJPKQ_BV7nVq5u';
@@ -24,7 +25,6 @@
     SUPABASE_KEY
   );
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="bg-canvas" aria-hidden="true">
@@ -50,7 +50,7 @@
           <span class="hl-week">two weeks</span> of <span class="hl-confusion">confusion.</span>
         </p>
         <div class="hero-cta-wrap fade fade-2">
-          <button id="hero-trigger" class="hero-trigger-btn">I want this</button>
+          <button id="hero-trigger" class="hero-trigger-btn" type="button">I want this</button>
           <form id="hero-form" class="hero-form" hidden>
             <input id="hero-email" name="email" type="email" placeholder="your@email.com" required autocomplete="email">
             <button type="submit">Apply for Early Access</button>
@@ -59,10 +59,10 @@
         <div id="segment-block" class="segment-block" aria-live="polite" hidden>
           <p class="segment-question">Which best describes your situation?</p>
           <div class="segment-choices">
-            <button class="seg-btn" data-seg="b2b">My team struggles with onboarding new developers</button>
-            <button class="seg-btn" data-seg="b2c">I need to understand new codebases quickly for work</button>
-            <button class="seg-btn" data-seg="startup">I manage a small team and face both</button>
-            <button class="seg-btn" data-seg="other">Other</button>
+            <button class="seg-btn" data-seg="b2b" type="button">My team struggles with onboarding new developers</button>
+            <button class="seg-btn" data-seg="b2c" type="button">I need to understand new codebases quickly for work</button>
+            <button class="seg-btn" data-seg="startup" type="button">I manage a small team and face both</button>
+            <button class="seg-btn" data-seg="other" type="button">Other</button>
           </div>
           <textarea id="seg-other-input" class="seg-other-input" placeholder="Tell us more..." hidden></textarea>
           <p id="segment-thanks" class="segment-thanks" hidden></p>
@@ -154,9 +154,11 @@
     const segmentBlock = document.getElementById('segment-block');
     const segmentThanks = document.getElementById('segment-thanks');
     const segOtherInput = document.getElementById('seg-other-input');
+    const segmentButtons = document.querySelectorAll('.seg-btn');
 
     let heroEmail = '';
     let leadId = null; // INSERT 후 반환된 row ID (세그먼트 PATCH용)
+    let otherInputHandler = null;
 
     // 1단계: 트리거 버튼 클릭 → 폼 노출
     if (heroTrigger) {
@@ -182,12 +184,17 @@
         segmentBlock.hidden = false;
 
         // DB 저장 (백그라운드, 실패해도 UI에 영향 없음)
-        leadId = await insertLead(heroEmail);
+        try {
+          leadId = await insertLead(heroEmail);
+        } catch (error) {
+          console.error('Lead creation crashed:', error);
+          leadId = null;
+        }
       });
     }
 
     // 세그먼트 선택
-    document.querySelectorAll('.seg-btn').forEach((btn) => {
+    segmentButtons.forEach((btn) => {
       btn.addEventListener('click', async () => {
         const seg = btn.dataset.seg;
 
@@ -197,20 +204,26 @@
           segOtherInput.hidden = false;
           segOtherInput.focus();
 
-          segOtherInput.addEventListener('keydown', async function handler(ev) {
+          if (otherInputHandler) {
+            segOtherInput.removeEventListener('keydown', otherInputHandler);
+          }
+
+          otherInputHandler = async function handler(ev) {
             if (ev.key === 'Enter' && !ev.shiftKey) {
               ev.preventDefault();
               const otherText = segOtherInput.value.trim();
               if (!otherText) return;
-              segOtherInput.removeEventListener('keydown', handler);
-              await saveSegment('other', otherText);
+              segOtherInput.removeEventListener('keydown', otherInputHandler);
+              otherInputHandler = null;
+              await saveSegmentSafely('other', otherText);
               showSegmentThanks('other');
             }
-          });
+          };
+          segOtherInput.addEventListener('keydown', otherInputHandler);
           return;
         }
 
-        await saveSegment(seg, '');
+        await saveSegmentSafely(seg, '');
         showSegmentThanks(seg);
       });
     });
@@ -265,6 +278,14 @@
       }
     }
 
+    async function saveSegmentSafely(seg, text) {
+      try {
+        await saveSegment(seg, text);
+      } catch (error) {
+        console.error('Segment save crashed:', error);
+      }
+    }
+
     function showSegmentThanks(seg) {
       const messages = {
         b2b:     "Thanks. We're focusing on teams like yours first. We'll reach out with early access — usually within a week.",
@@ -272,7 +293,9 @@
         startup: "Perfect. You're exactly who this is built for. Expect to hear from us first.",
         other:   "Thanks. We'll take a close look and follow up."
       };
-      document.querySelectorAll('.seg-btn').forEach(b => b.disabled = true);
+      segmentButtons.forEach((b) => {
+        b.disabled = true;
+      });
       segOtherInput.hidden = true;
       segmentThanks.hidden = false;
       segmentThanks.textContent = messages[seg] || messages.other;
