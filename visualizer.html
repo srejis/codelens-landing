@@ -902,8 +902,112 @@ canvas.addEventListener('wheel', e=>{
   offsetX=cx-wx*scale; offsetY=cy-wy*scale; draw();
 },{passive:false});
 // ═══════════════════════════════════════════════════════════════
-// SIDEBAR TOGGLE
+// ACTIONS
 // ═══════════════════════════════════════════════════════════════
+
+function highlightCode(code) {
+  const escaped = code
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const highlighted = escaped
+    // comments (# single-line, // single-line, /* block */)
+    .replace(/(#[^\n]*|\/\/[^\n]*|\/\*[\s\S]*?\*\/)/g, '<span class="cm">$1</span>')
+    // strings
+    .replace(/(&quot;[^&]*?&quot;|&#039;[^&]*?&#039;|`[^`]*`)/g, '<span class="str">$1</span>')
+    // keywords
+    .replace(/\b(def|class|return|import|from|if|else|elif|for|while|try|except|finally|with|as|pass|break|continue|raise|yield|lambda|and|or|not|in|is|None|True|False|async|await|function|const|let|var|new|this|typeof|instanceof|void|delete|switch|case|default|throw|catch|extends|super|static|export|module|require)\b/g, '<span class="kw">$1</span>')
+    // function/method names
+    .replace(/\b([a-zA-Z_]\w*)\s*(?=\()/g, '<span class="fn">$1</span>')
+    // decorators
+    .replace(/(@\w+)/g, '<span class="dec">$1</span>')
+    // numbers
+    .replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
+
+getElementById('panel-code').innerHTML = highlighted;
+}
+
+function clearCodePanel() {
+  document.getElementById('panel-code').innerHTML =
+    '<span style="color:#5c6370;font-style:italic">Click any node to start.</span>';
+}
+
+function selectNode(nd) {
+  selectedNode = nd;
+  const col = nd.color || '#6366f1';
+  panel.style.setProperty('--panel-accent-soft',   col + '1e');
+  panel.style.setProperty('--panel-accent-shadow',  col + '60');
+  panel.style.setProperty('--panel-accent-glow',    col + '2e');
+
+  document.getElementById('p-badge').textContent      = (nd.type || 'node').toUpperCase();
+  document.getElementById('p-badge').style.background = col + '22';
+  document.getElementById('p-badge').style.color      = col;
+  document.getElementById('p-badge').style.boxShadow  = '0 0 0 1px ' + col + '55';
+
+  document.getElementById('panel-title').textContent   = nd.label || nd.id;
+  document.getElementById('panel-role').textContent    = nd.role    || '-';
+  document.getElementById('panel-process').textContent = nd.process || '-';
+
+  if (nd.code) {
+    highlightCode(nd.code);
+  } else {
+    document.getElementById('panel-code').innerHTML =
+      '<span style="color:#5c6370;font-style:italic">No source snippet available.</span>';
+  }
+
+  const drillBtn = document.getElementById('drill-btn');
+  if (nd.childKey && GRAPH_DB[nd.childKey]) {
+    drillBtn.style.display = 'block';
+    drillBtn.onclick = () => drillInto(nd);
+  } else {
+    drillBtn.style.display = 'none';
+  }
+
+  panel.classList.add('open');
+  draw();
+}
+
+function clearSelection() {
+  selectedNode = null;
+  panel.classList.remove('open');
+  clearCodePanel();
+  draw();
+}
+
+function drillInto(nd) {
+  if (!nd.childKey || !GRAPH_DB[nd.childKey]) return;
+  graphStack.push({ key: nd.childKey, label: nd.label, graph: GRAPH_DB[nd.childKey] });
+  selectedNode = null;
+  panel.classList.remove('open');
+  clearCodePanel();
+  layout();
+  fitGraph();
+  updateBreadcrumb();
+}
+
+function goToDepth(depth) {
+  if (depth < 0 || depth >= graphStack.length) return;
+  graphStack = graphStack.slice(0, depth + 1);
+  selectedNode = null;
+  panel.classList.remove('open');
+  clearCodePanel();
+  layout();
+  fitGraph();
+  updateBreadcrumb();
+}
+
+function updateBreadcrumb() {
+  const bc = document.getElementById('breadcrumb');
+  bc.innerHTML = graphStack.map((entry, i) => {
+    if (i === graphStack.length - 1) {
+      return '<span class="crumb-current">' + entry.label + '</span>';
+    }
+    return '<button class="crumb-btn" onclick="goToDepth(' + i + ')">' + entry.label + '</button>'
+         + '<span class="crumb-sep">></span>';
+  }).join('');
+}
+
 function toggleSidebar() {
   const sb  = document.getElementById('sidebar');
   const btn = document.getElementById('sidebar-toggle');
@@ -913,17 +1017,50 @@ function toggleSidebar() {
   btn.classList.toggle('is-open', !isOpen);
   ov.classList.toggle('show', !isOpen);
 }
-// ═══════════════════════════════════════════════════════════════
 
-// INIT: graph-data.json 로드 후 시작
+function fitGraph() {
+  if (!nodes.length) return;
+  const pad = 60;
+  const xs = nodes.map(n => n.x);
+  const ys = nodes.map(n => n.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const gW = maxX - minX || 1;
+  const gH = maxY - minY || 1;
+  const scaleX = (canvas.width  - pad * 2) / gW;
+  const scaleY = (canvas.height - pad * 2) / gH;
+  scale = Math.min(scaleX, scaleY, 2);
+  offsetX = (canvas.width  - gW * scale) / 2 - minX * scale;
+  offsetY = (canvas.height - gH * scale) / 2 - minY * scale;
+  draw();
+}
+
+function resetView() {
+  scale = 1;
+  offsetX = canvas.width  / 2;
+  offsetY = canvas.height / 2;
+  draw();
+}
+
+function goToRoot() {
+  goToDepth(0);
+}
+
+document.getElementById('panel-close').onclick = () => clearSelection();
+
+// INIT
 fetch('graph-data.json')
   .then(r => r.json())
   .then(data => {
     GRAPH_DB = data;
     graphStack = [{ key: 'root', label: 'Root', graph: GRAPH_DB.root }];
     layout();
-    draw();
+    fitGraph();
   })
   .catch(err => {
     console.error('graph-data.json load failed:', err);
-    document.body.innerHTML += '<div style="color:#ef4444;pad
+    document.body.innerHTML += '<div style="color:#ef4444;padding:20px;font-family:monospace">graph-data.json load failed: ' + err.message + '</div>';
+  });
+</script>
+</body>
+</html>
