@@ -671,6 +671,179 @@ a { color: inherit; text-decoration: none; }
   .step-num { font-size: 40px; }
 }
 
+/* ─── 감정 축 강조 키워드 ─────────────────────────── */
+.hl-week {
+  color: #f59e0b;
+  -webkit-text-fill-color: #f59e0b;
+  background: none;
+  font-weight: 600;
+  text-shadow: 0 0 20px rgba(245,158,11,0.4);
+}
+
+.hl-confusion {
+  color: #f87171;
+  -webkit-text-fill-color: #f87171;
+  background: none;
+  font-weight: 600;
+  text-shadow: 0 0 20px rgba(248,113,113,0.4);
+}
+
+.hl-understand {
+  color: #a78bfa;
+  -webkit-text-fill-color: #a78bfa;
+  background: none;
+  font-weight: 600;
+  text-shadow: 0 0 20px rgba(167,139,250,0.35);
+}
+
+.hl-stress {
+  color: #f87171;
+  -webkit-text-fill-color: #f87171;
+  background: none;
+  text-shadow: 0 0 28px rgba(248,113,113,0.5);
+}
+
+/* ─── Hero Form ──────────────────────────────────── */
+.hero-form {
+  display: inline-flex;
+  gap: 10px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hero-form input[type="email"] {
+  min-width: 260px;
+  min-height: 52px;
+  padding: 0 20px;
+  border: 1px solid var(--border-bright);
+  border-radius: 8px;
+  background: rgba(24, 25, 41, 0.85);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  transition: border-color 0.18s ease;
+}
+
+.hero-form input[type="email"]:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.hero-form button {
+  min-height: 52px;
+  padding: 0 32px;
+  border: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 0 28px rgba(99,102,241,0.4), 0 4px 16px rgba(0,0,0,0.24);
+  white-space: nowrap;
+}
+
+.hero-form button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 40px rgba(99,102,241,0.55), 0 8px 24px rgba(0,0,0,0.28);
+}
+
+/* ─── Segment Block (이메일 이후 인라인 노출) ────── */
+.segment-block {
+  margin-top: 28px;
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.segment-question {
+  margin: 0 0 16px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.segment-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.seg-btn {
+  padding: 14px 20px;
+  border: 1px solid var(--border-bright);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.seg-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: rgba(99,102,241,0.08);
+  color: var(--text);
+}
+
+.seg-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.seg-other-input {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  margin: 10px auto 0;
+  padding: 12px 16px;
+  border: 1px solid var(--border-bright);
+  border-radius: 8px;
+  background: rgba(24,25,41,0.85);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.seg-other-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.segment-thanks {
+  margin: 20px auto 0;
+  max-width: 480px;
+  padding: 16px 20px;
+  border: 1px solid rgba(16,185,129,0.3);
+  border-radius: 8px;
+  background: rgba(16,185,129,0.06);
+  color: #7ef0b8;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  text-align: left;
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+/* ─── Demo Still Early ──────────────────────────── */
+.demo-still-early {
+  margin: 24px 0 8px;
+  text-align: center;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+
 @media (max-width: 720px) {
   .site-nav { padding: 16px; }
   .brand-text { font-size: 20px; }

@@ -29,24 +29,39 @@
       <span class="brand-dot"></span>
       <span class="brand-text">CODELENS</span>
     </a>
-    <a class="nav-cta" href="#demo" data-track="cta_click">Try Demo</a>
+    <a class="nav-cta" href="#hero-form" data-track="cta_click">Get Early Access</a>
   </nav>
 
   <main id="top">
     <section class="hero section">
       <div class="hero-inner">
-        <p class="hero-audience fade fade-0">AI CODEBASE INTELLIGENCE</p>
-        <h1 class="hero-title fade fade-0">Understand your code <span class="hl">without reading it.</span></h1>
-        <p class="hero-copy fade fade-1">See structure and flow <span class="hl">instantly.</span></p>
-        <a class="primary-cta fade fade-2" href="#demo" data-track="cta_click">Try Demo <span class="arrow-icon">&rarr;</span></a>
-        <p class="hero-hint fade fade-2"><span class="arrow-icon">&darr;</span> Click once. Understand faster.</p>
+        <h1 class="hero-title fade fade-0">New codebase.<br>No docs.<br><span class="hl-stress">Clock's ticking.</span></h1>
+        <p class="hero-copy fade fade-1">
+          Getting up to speed shouldn't take
+          <span class="hl-week">two weeks</span> of <span class="hl-confusion">confusion.</span>
+        </p>
+        <form id="hero-form" class="hero-form fade fade-2">
+          <input id="hero-email" name="email" type="email" placeholder="your@email.com" required autocomplete="email">
+          <button type="submit">I want this</button>
+        </form>
+        <div id="segment-block" class="segment-block" aria-live="polite" hidden>
+          <p class="segment-question">Which best describes your situation?</p>
+          <div class="segment-choices">
+            <button class="seg-btn" data-seg="b2b">My team struggles with onboarding new developers</button>
+            <button class="seg-btn" data-seg="b2c">I need to understand new codebases quickly for work</button>
+            <button class="seg-btn" data-seg="startup">I manage a small team and face both</button>
+            <button class="seg-btn" data-seg="other">Other</button>
+          </div>
+          <textarea id="seg-other-input" class="seg-other-input" placeholder="Tell us more..." hidden></textarea>
+          <p id="segment-thanks" class="segment-thanks" hidden></p>
+        </div>
       </div>
     </section>
 
-    <section class="section problem">
+    <section class="section pain">
       <div class="section-head centered" data-reveal>
-        <p class="section-kicker">THE PROBLEM</p>
-        <h2>Sound familiar?</h2>
+        <p class="section-kicker">THE PAIN</p>
+        <h2>This is where the time goes.</h2>
       </div>
       <div class="problem-grid">
         <article class="problem-card problem-card-indigo" data-reveal data-reveal-delay="1">
@@ -56,8 +71,8 @@
               <path d="M10 6v4.5l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <h3>Weeks just reading</h3>
-          <p>New devs spend <span class="hl">2&ndash;6 weeks</span> just understanding the codebase before writing a single line.</p>
+          <h3>Day 3. Still lost.</h3>
+          <p>You've been reading files for <span class="hl-week">two weeks</span> and still can't trace where a request actually goes. The <span class="hl-confusion">confusion</span> doesn't lift — it just spreads to new files.</p>
         </article>
 
         <article class="problem-card problem-card-cyan" data-reveal data-reveal-delay="2">
@@ -68,8 +83,8 @@
               <circle cx="10" cy="15" r="0.75" fill="currentColor"/>
             </svg>
           </div>
-          <h3>Nobody knows why</h3>
-          <p>Half the modules exist for reasons lost to time. No docs, no comments, no history.</p>
+          <h3>Asking again.</h3>
+          <p>You interrupt a senior dev to <span class="hl-understand">understand</span> one module. They explain it. You forget the context by tomorrow. You ask again next week. The <span class="hl-confusion">confusion</span> is a tax everyone pays.</p>
         </article>
 
         <article class="problem-card problem-card-green" data-reveal data-reveal-delay="3">
@@ -80,8 +95,8 @@
               <path d="M15 2v4M13 4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
           </div>
-          <h3>Senior devs interrupted</h3>
-          <p>Your best engineers spend <span class="hl">30%</span> of their time answering &quot;what does this do?&quot; questions.</p>
+          <h3>Sprint 1. Zero output.</h3>
+          <p>The ticket is simple. But you can't touch it until you <span class="hl-understand">understand</span> three modules you've never seen. <span class="hl-week">Two weeks</span> in, and you still haven't shipped anything.</p>
         </article>
       </div>
       <p class="problem-summary" data-reveal>This is not a documentation problem. It's a <span class="hl">code understanding</span> problem.</p>
@@ -112,18 +127,14 @@
     <section class="section demo" id="demo">
       <div class="section-head" data-reveal>
         <p class="section-kicker">LIVE DEMO</p>
-        <h2>See it in action.</h2>
-        <div class="compare-row">
-          <span class="compare-before">Traditional: read files, trace manually.</span>
-          <span class="compare-arrow">→</span>
-          <span class="compare-after">CodeLens: see structure <span class="hl">instantly.</span></span>
-        </div>
+        <h2>This is what those <span class="hl-week">two weeks</span> could look like instead.</h2>
       </div>
       <div class="demo-frame" id="demo-frame">
         <div class="demo-badge">LIVE INTERACTIVE</div>
         <div class="demo-loading" id="demo-loading">Loading demo...</div>
         <iframe id="demo-iframe" src="visualizer.html" title="CodeLens live demo" loading="lazy"></iframe>
       </div>
+      <p class="demo-still-early" data-reveal>Still early. Already useful.</p>
       <p class="demo-caption"><span class="arrow-icon">&uarr;</span> Fully interactive &mdash; this is not a screenshot</p>
     </section>
 
@@ -241,6 +252,89 @@
         setFormStatus('Submission failed. Please try again.', 'error');
       }
     });
+
+    // Hero form — 이메일 수집 + 세그먼트 노출
+    const heroForm = document.getElementById('hero-form');
+    const segmentBlock = document.getElementById('segment-block');
+    const segmentThanks = document.getElementById('segment-thanks');
+    const segOtherInput = document.getElementById('seg-other-input');
+
+    let heroEmail = '';
+
+    if (heroForm) {
+      heroForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        heroEmail = document.getElementById('hero-email').value.trim();
+        if (!heroEmail) return;
+
+        if (typeof gtag === 'function') gtag('event', 'hero_email_submit');
+
+        // Formspree로 이메일 저장 (기존 waitlist 엔드포인트 재사용)
+        const fd = new FormData();
+        fd.append('email', heroEmail);
+        fd.append('source', 'hero');
+        fetch('https://formspree.io/f/xrejbjbb', {
+          method: 'POST', body: fd, headers: { Accept: 'application/json' }
+        });
+
+        // 폼 숨기고 세그먼트 노출
+        heroForm.style.display = 'none';
+        segmentBlock.hidden = false;
+      });
+    }
+
+    // 세그먼트 선택
+    document.querySelectorAll('.seg-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const seg = btn.dataset.seg;
+
+        if (typeof gtag === 'function') gtag('event', 'segment_select', { segment: seg });
+
+        if (seg === 'other') {
+          segOtherInput.hidden = false;
+          segOtherInput.focus();
+
+          segOtherInput.addEventListener('keydown', async function handler(ev) {
+            if (ev.key === 'Enter' && !ev.shiftKey) {
+              ev.preventDefault();
+              const otherText = segOtherInput.value.trim();
+              if (!otherText) return;
+              segOtherInput.removeEventListener('keydown', handler);
+              await saveSegment('other', otherText);
+              showSegmentThanks('other');
+            }
+          });
+          return;
+        }
+
+        await saveSegment(seg, '');
+        showSegmentThanks(seg);
+      });
+    });
+
+    async function saveSegment(seg, text) {
+      const fd = new FormData();
+      fd.append('email', heroEmail);
+      fd.append('segment', seg);
+      if (text) fd.append('other_text', text);
+      fd.append('source', 'segment');
+      await fetch('https://formspree.io/f/xrejbjbb', {
+        method: 'POST', body: fd, headers: { Accept: 'application/json' }
+      });
+    }
+
+    function showSegmentThanks(seg) {
+      const messages = {
+        b2b:     "Thanks. We're focusing on teams like yours first. We'll reach out with early access — usually within a week.",
+        b2c:     "Got it. We'll send you a walkthrough the moment it's ready.",
+        startup: "Perfect. You're exactly who this is built for. Expect to hear from us first.",
+        other:   "Thanks. We'll take a close look and follow up."
+      };
+      document.querySelectorAll('.seg-btn').forEach(b => b.disabled = true);
+      segOtherInput.hidden = true;
+      segmentThanks.hidden = false;
+      segmentThanks.textContent = messages[seg] || messages.other;
+    }
 
     const demoFrame = document.getElementById('demo-frame');
     const demoIframe = document.getElementById('demo-iframe');
