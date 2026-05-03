@@ -19,7 +19,12 @@
 <script>
   const SUPABASE_URL = 'https://cpjrsjxeuylyallogrpt.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_tdud7yWZqS1qYL8_UOJPKQ_BV7nVq5u';
+  const supabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="bg-canvas" aria-hidden="true">
@@ -212,61 +217,51 @@
 
     // 이메일 INSERT → row ID 반환
     async function insertLead(email) {
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
-          method: 'POST',
-          headers: {
-            apikey: SUPABASE_KEY,
-            Authorization: `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            Prefer: 'return=representation'
-          },
-          body: JSON.stringify({ email, choice: null, willingness: null, other_text: null })
-        });
-        if (res.ok) {
-          const data = await res.json();
-          return data[0]?.id ?? null;
-        }
-        console.error('Supabase insert failed:', await res.text());
-        return null;
-      } catch (err) {
-        console.error('Supabase network error:', err);
+      const { data, error } = await supabase
+        .from('leads')
+        .insert([
+          {
+            email,
+            choice: null,
+            willingness: null,
+            other_text: null
+          }
+        ])
+        .select();
+
+      if (error) {
+        console.error('Insert failed:', error);
         return null;
       }
+
+      return data[0]?.id || null;
     }
 
     // 세그먼트 — 기존 row PATCH (없으면 INSERT fallback)
     async function saveSegment(seg, text) {
-      try {
-        if (leadId) {
-          // 동일 row 업데이트 (이중 insert 방지)
-          const res = await fetch(`${SUPABASE_URL}/rest/v1/leads?id=eq.${leadId}`, {
-            method: 'PATCH',
-            headers: {
-              apikey: SUPABASE_KEY,
-              Authorization: `Bearer ${SUPABASE_KEY}`,
-              'Content-Type': 'application/json',
-              Prefer: 'return=minimal'
-            },
-            body: JSON.stringify({ choice: seg, other_text: text || null })
-          });
-          if (!res.ok) console.error('Supabase patch failed:', await res.text());
-        } else {
-          // leadId 없을 때 fallback INSERT
-          const res = await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
-            method: 'POST',
-            headers: {
-              apikey: SUPABASE_KEY,
-              Authorization: `Bearer ${SUPABASE_KEY}`,
-              'Content-Type': 'application/json',
-              Prefer: 'return=minimal'
-            },
-            body: JSON.stringify({ email: heroEmail, choice: seg, willingness: null, other_text: text || null })
-          });
-          if (!res.ok) console.error('Supabase insert failed:', await res.text());
-        }
-      } catch (err) {
-        console.error('Supabase network error:', err);
+      if (leadId) {
+        const { error } = await supabase
+          .from('leads')
+          .update({
+            choice: seg,
+            other_text: text || null
+          })
+          .eq('id', leadId);
+
+        if (error) console.error('Update failed:', error);
+      } else {
+        const { error } = await supabase
+          .from('leads')
+          .insert([
+            {
+              email: heroEmail,
+              choice: seg,
+              willingness: null,
+              other_text: text || null
+            }
+          ]);
+
+        if (error) console.error('Insert failed:', error);
       }
     }
 
