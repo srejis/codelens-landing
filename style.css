@@ -13,6 +13,8 @@
   --cyan: #06b6d4;
 }
 
+[hidden] { display: none !important; }
+
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 
