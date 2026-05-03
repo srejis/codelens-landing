@@ -22,6 +22,11 @@
     --amber: #f59e0b;
     --red: #ef4444;
     --cyan: #06b6d4;
+    /* Layout sizing — breakpoint 별로 재정의 */
+    --sidebar-w: 430px;
+    --panel-w:   320px;
+    --titlebar-h: 38px;
+    --breadcrumb-h: 36px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -85,7 +90,7 @@
 
   /* SIDEBAR */
   #sidebar {
-    width: 430px;
+    width: var(--sidebar-w);
     background: var(--bg-panel);
     border-right: 1px solid var(--border);
     display: flex;
@@ -208,11 +213,11 @@
     display: flex; flex-direction: column;
     flex-shrink: 0;
   }
-  #panel.open { width: 320px; }
+  #panel.open { width: var(--panel-w); }
   #panel.transitioning { pointer-events: none; }
 
   #panel-inner {
-    width: 320px; height: 100%;
+    width: var(--panel-w); height: 100%;
     display: flex; flex-direction: column;
     overflow: hidden;
   }
@@ -380,6 +385,149 @@
     100% { opacity: 1; }
   }
   .flash { animation: canvasFlash 0.35s ease-out; }
+
+  /* ════════════════════════════════════════════════════════════════
+     SIDEBAR TOGGLE BUTTON  (large 화면에서는 숨김)
+     ════════════════════════════════════════════════════════════════ */
+  #sidebar-toggle {
+    display: none;
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 4px;
+    width: 32px; height: 28px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 5px 6px;
+    -webkit-app-region: no-drag;
+    transition: border-color 0.12s, color 0.12s;
+    flex-shrink: 0;
+  }
+  #sidebar-toggle:hover { border-color: var(--accent); color: var(--text); }
+  #sidebar-toggle span {
+    display: block;
+    width: 16px; height: 1.5px;
+    background: currentColor;
+    border-radius: 1px;
+    transition: transform 0.22s, opacity 0.22s;
+  }
+  #sidebar-toggle.is-open span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+  #sidebar-toggle.is-open span:nth-child(2) { opacity: 0; }
+  #sidebar-toggle.is-open span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+
+  /* SIDEBAR BACKDROP */
+  #sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 180;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+  #sidebar-overlay.show { display: block; }
+
+  /* ════════════════════════════════════════════════════════════════
+     LG  1024 – 1399px  (compact desktop)
+     ════════════════════════════════════════════════════════════════ */
+  @media (max-width: 1399px) {
+    :root { --sidebar-w: 300px; --panel-w: 260px; }
+    #panel-role, #panel-process { font-size: 14px; }
+    .desc-section-title { font-size: 12px; }
+    #panel-title { font-size: 14px; }
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     MD  640 – 1023px  (tablet / 작은 창)
+     sidebar → left overlay drawer
+     panel   → bottom sheet
+     ════════════════════════════════════════════════════════════════ */
+  @media (max-width: 1023px) {
+    :root { --sidebar-w: 300px; --panel-w: 100%; --titlebar-h: 36px; }
+
+    #sidebar-toggle { display: flex; }
+
+    /* 사이드바: fixed left drawer */
+    #sidebar {
+      position: fixed !important;
+      left: 0; top: 0; bottom: 0;
+      z-index: 200;
+      height: 100vh;
+      width: var(--sidebar-w) !important;
+      transform: translateX(calc(-1 * var(--sidebar-w)));
+      transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+      border-right: 1px solid var(--border-bright);
+      box-shadow: 8px 0 32px rgba(0,0,0,0.5);
+    }
+    #sidebar.open { transform: translateX(0); }
+
+    /* 패널: bottom sheet */
+    #panel {
+      position: fixed !important;
+      left: 0; right: 0; bottom: 0;
+      width: 100% !important;
+      height: 0;
+      max-height: 55vh;
+      border-left: none !important;
+      border-top: 1px solid var(--border);
+      border-radius: 14px 14px 0 0;
+      transition: height 0.28s cubic-bezier(0.4,0,0.2,1) !important;
+      z-index: 100;
+      overflow: hidden;
+    }
+    #panel.open { height: 52vh; width: 100% !important; }
+    #panel-inner { width: 100% !important; }
+
+    /* bottom sheet drag handle */
+    #panel-header { padding-top: 20px; }
+    #panel-header::before {
+      content: '';
+      position: absolute;
+      top: 8px; left: 50%;
+      transform: translateX(-50%);
+      width: 36px; height: 4px;
+      border-radius: 2px;
+      background: var(--border-bright);
+    }
+
+    #panel-role, #panel-process { font-size: 13px; }
+    .desc-section-title { font-size: 11px; }
+    #panel-title { font-size: 13px; }
+
+    #hint-overlay { max-width: 180px; font-size: 9px; padding: 8px 10px; line-height: 1.7; }
+    .hint-title { font-size: 10px; }
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     SM  < 640px  (mobile)
+     ════════════════════════════════════════════════════════════════ */
+  @media (max-width: 639px) {
+    :root { --sidebar-w: min(85vw, 300px); --titlebar-h: 34px; }
+
+    #titlebar { height: 34px; padding: 0 10px; }
+    #layout    { height: calc(100vh - 34px); }
+    #app-title { font-size: 11px; letter-spacing: 0.06em; }
+
+    #breadcrumb { height: 30px; font-size: 10px; }
+    .crumb-btn, .crumb-current { font-size: 10px; padding: 2px 4px; }
+
+    #panel.open { height: 62vh; }
+
+    .ctrl-btn { font-size: 10px; padding: 6px 8px; }
+    .sidebar-label { font-size: 8px; }
+    .panel-section-label { font-size: 8px; }
+
+    #panel-title  { font-size: 12px; }
+    .p-badge      { font-size: 8px; padding: 2px 7px; }
+    #panel-role, #panel-process { font-size: 12px; }
+    .desc-section-title { font-size: 10px; }
+    #panel-value { font-size: 9px; margin: 0 10px 10px; padding: 8px 10px; }
+    #drill-btn   { font-size: 10px; padding: 8px; width: calc(100% - 20px); margin: 0 10px 10px; }
+
+    #depth-badge { font-size: 9px; padding: 4px 8px; bottom: 12px; left: 12px; }
+    #hint-overlay { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -387,10 +535,15 @@
 <!-- TITLEBAR -->
 <div id="titlebar">
   <div id="titlebar-left">
+    <button id="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+      <span></span><span></span><span></span>
+    </button>
     <div class="title-dot"></div>
     <div id="app-title">CodeLens &mdash; Live Demo</div>
   </div>
 </div>
+
+<div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <div id="layout">
 
@@ -478,10 +631,18 @@ function resize() {
   canvas.height = canvasWrap.offsetHeight;
 }
 resize();
-window.addEventListener('resize', () => { resize(); draw(); });
+window.addEventListener('resize', () => {
+  if (window.innerWidth >= 1024) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-toggle').classList.remove('is-open');
+    document.getElementById('sidebar-overlay').classList.remove('show');
+  }
+  resize(); draw();
+});
 
 // ?⑤꼸 width ?몃옖吏??以?留??꾨젅??罹붾쾭???ш린 ?숆린????湲??李뚭렇?ъ쭚 諛⑹?
 panel.addEventListener('transitionstart', () => {
+  if (window.innerWidth < 1024) return; // 모바일: 패널 fixed, 캔버스 크기 불변
   let rafId;
   const sync = () => {
     const newW = canvasWrap.offsetWidth;
@@ -501,11 +662,15 @@ panel.addEventListener('transitionstart', () => {
 function layout() {
   const g = graphStack[graphStack.length-1].graph;
   const W = canvas.width, H = canvas.height;
+  const S = Math.min(W, H);
+  const nodeR     = Math.max(18, Math.min(34, S * 0.042));   // 18–34px
+  const springLen = Math.max(90, Math.min(170, S * 0.20));   // 90–170px
+  const repulse   = Math.max(4000, Math.min(16000, S * S * 0.018));
   const n = g.nodes.length;
   nodes = g.nodes.map((nd,i) => {
     const a = (2*Math.PI*i/n) - Math.PI/2;
-    const r = Math.min(W,H)*0.28;
-    return { ...nd, x: W/2+r*Math.cos(a), y: H/2+r*Math.sin(a), vx:0, vy:0, radius:34 };
+    const r = S * 0.28;
+    return { ...nd, x: W/2+r*Math.cos(a), y: H/2+r*Math.sin(a), vx:0, vy:0, radius: nodeR };
   });
   edges = g.edges.map(e => ({
     ...e,
@@ -518,7 +683,7 @@ function layout() {
         const na=nodes[a],nb=nodes[b];
         const dx=nb.x-na.x, dy=nb.y-na.y;
         const dist=Math.sqrt(dx*dx+dy*dy)||1;
-        const f=16000/(dist*dist);
+        const f=repulse/(dist*dist);
         na.vx-=(dx/dist)*f; na.vy-=(dy/dist)*f;
         nb.vx+=(dx/dist)*f; nb.vy+=(dy/dist)*f;
       }
@@ -526,7 +691,7 @@ function layout() {
     for (const e of edges) {
       const s=e.sn(),t=e.tn(); if(!s||!t) continue;
       const dx=t.x-s.x, dy=t.y-s.y, d=Math.sqrt(dx*dx+dy*dy)||1;
-      const f=(d-170)*0.035;
+      const f=(d-springLen)*0.035;
       s.vx+=(dx/d)*f; s.vy+=(dy/d)*f;
       t.vx-=(dx/d)*f; t.vy-=(dy/d)*f;
     }
@@ -725,6 +890,73 @@ canvas.addEventListener('wheel', e=>{
   scale=Math.max(0.15,Math.min(6,scale*d));
   offsetX=cx-wx*scale; offsetY=cy-wy*scale; draw();
 },{passive:false});
+// ═══════════════════════════════════════════════════════════════
+// TOUCH EVENTS  (모바일 팬 + 핀치줌)
+// ═══════════════════════════════════════════════════════════════
+let _touchStartPos = null;
+let _touchPinchDist = null;
+
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (e.touches.length === 1) {
+    const t = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const cx = t.clientX - rect.left, cy = t.clientY - rect.top;
+    dragging = true;
+    dragStart = { x: cx, y: cy };
+    panStart  = { x: offsetX, y: offsetY };
+    _touchStartPos  = { x: cx, y: cy };
+    _touchPinchDist = null;
+  } else if (e.touches.length === 2) {
+    dragging = false;
+    const t0 = e.touches[0], t1 = e.touches[1];
+    _touchPinchDist = Math.hypot(t1.clientX-t0.clientX, t1.clientY-t0.clientY);
+    _touchStartPos  = null;
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  if (e.touches.length === 1 && dragging) {
+    const t = e.touches[0];
+    offsetX = panStart.x + (t.clientX - rect.left) - dragStart.x;
+    offsetY = panStart.y + (t.clientY - rect.top)  - dragStart.y;
+    draw();
+  } else if (e.touches.length === 2 && _touchPinchDist !== null) {
+    const t0 = e.touches[0], t1 = e.touches[1];
+    const newDist = Math.hypot(t1.clientX-t0.clientX, t1.clientY-t0.clientY);
+    const ratio = newDist / _touchPinchDist;
+    const mx = ((t0.clientX+t1.clientX)/2) - rect.left;
+    const my = ((t0.clientY+t1.clientY)/2) - rect.top;
+    const wx = (mx - offsetX)/scale, wy = (my - offsetY)/scale;
+    scale = Math.max(0.15, Math.min(6, scale * ratio));
+    offsetX = mx - wx*scale;
+    offsetY = my - wy*scale;
+    _touchPinchDist = newDist;
+    draw();
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  e.preventDefault();
+  if (e.changedTouches.length === 1 && _touchStartPos) {
+    const rect = canvas.getBoundingClientRect();
+    const t = e.changedTouches[0];
+    const cx = t.clientX - rect.left, cy = t.clientY - rect.top;
+    const moved = Math.abs(cx - _touchStartPos.x) + Math.abs(cy - _touchStartPos.y) > 10;
+    dragging = false;
+    if (!moved) {
+      const w = toWorld(cx, cy);
+      const hit = hitNode(w.x, w.y);
+      if (hit) selectNode(hit); else clearSelection();
+    }
+  }
+  _touchStartPos = null; _touchPinchDist = null; dragging = false;
+}, { passive: false });
+// ═══════════════════════════════════════════════════════════════
+
+
 
 // ??? ACTIONS ??????????????????????????????????????????????????????????????????
 function highlightCode(code) {
@@ -821,6 +1053,20 @@ function fitGraph(){
 function goToRoot(){ graphStack=[{key:'root',label:'Root',graph:GRAPH_DB.root}]; selectedNode=null; document.getElementById('panel').classList.remove('open'); clearCodePanel(); updateBreadcrumb(); layout(); draw(); }
 
 document.getElementById('panel-close').onclick=()=>clearSelection();
+
+// ═══════════════════════════════════════════════════════════════
+// SIDEBAR TOGGLE
+// ═══════════════════════════════════════════════════════════════
+function toggleSidebar() {
+  const sb  = document.getElementById('sidebar');
+  const btn = document.getElementById('sidebar-toggle');
+  const ov  = document.getElementById('sidebar-overlay');
+  const isOpen = sb.classList.contains('open');
+  sb.classList.toggle('open', !isOpen);
+  btn.classList.toggle('is-open', !isOpen);
+  ov.classList.toggle('show', !isOpen);
+}
+// ═══════════════════════════════════════════════════════════════
 
 // ??? INIT: JSON 濡쒕뱶 ???쒖옉 ??????????????????????????????????????????????????
 fetch('graph-data.json')
